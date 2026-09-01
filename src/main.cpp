@@ -1,8 +1,8 @@
 #include <algorithm>
 
+#include "book.hpp"
 #include "book_database.hpp"
 #include "comparators.hpp"
-#include "filters.hpp"
 #include "statsistics.hpp"
 
 using namespace bookdb;
@@ -21,10 +21,11 @@ int main() {
     BookDatabase<std::vector<Book>> db;
 
     /*
-
     Код закомментирован, чтобы не приводить к ошибке компиляции
+    */
 
     // Add some books
+
     db.EmplaceBack("1984", "George Orwell", 1949, Genre::SciFi, 4., 190);
     db.EmplaceBack("Animal Farm", "George Orwell", 1945, Genre::Fiction, 4.4, 143);
     db.EmplaceBack("The Great Gatsby", "F. Scott Fitzgerald", 1925, Genre::Fiction, 4.5, 120);
@@ -46,11 +47,12 @@ int main() {
 
     // Author histogram
     auto histogram = buildAuthorHistogramFlat(db);
-    std::print("Author histogram: {}", histogram);
+    // из-за бага в GCC 15 std::print для std::flat_map не работает, поэтому используем самописную функцию
+    printHistogram(histogram);
 
     // Ratings
     auto genreRatings = calculateGenreRatings(db.begin(), db.end());
-    std::print("\n\nAverage ratings by genres: {}\n", genreRatings);
+    printGenreRatings(genreRatings);
 
     auto avrRating = calculateAverageRating(db);
     std::print("Average books rating in library: {}\n", avrRating);
@@ -61,15 +63,14 @@ int main() {
     std::for_each(filtered.cbegin(), filtered.cend(), [](const auto &v) { std::print("{}\n", v.get()); });
 
     // Top 3 books
-    auto topBooks = getTopNBy(db, 3, comp::LessByRating{});
+    auto topBooks = getTopNBy(db, 3, comp::GreaterByRating{});
     std::print("\n\nTop 3 books by rating:\n");
     std::for_each(topBooks.cbegin(), topBooks.cend(), [](const auto &v) { std::print("{}\n", v.get()); });
 
     auto orwellBookIt = std::find_if(db.begin(), db.end(), [](const auto &v) { return v.author == "George Orwell"; });
     if (orwellBookIt != db.end()) {
-        std::print("\n\nTransparent lookup by authors. Found Orwell's book: {}\n", *orwellBookIt);
+        std::print("\nTransparent lookup by authors. Found Orwell's book: \n{}\n", *orwellBookIt);
     }
-    */
 
     return 0;
 }
