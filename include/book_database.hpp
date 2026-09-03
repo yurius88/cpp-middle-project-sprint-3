@@ -5,6 +5,7 @@
 #include <set>
 #include <string>
 #include <string_view>
+#include <unordered_set>
 #include <vector>
 
 #include "book.hpp"
@@ -32,15 +33,14 @@ public:
     using iterator = typename BookContainer::iterator;
     using const_iterator = typename BookContainer::const_iterator;
 
-    using AuthorContainer = std::set<std::string> /* Ваш код здесь */;
+    using AuthorContainer = std::unordered_set<std::string, TransparentStringHash> /* Ваш код здесь */;
 
     BookDatabase() = default;
     BookDatabase(std::initializer_list<Book> books) : books_(books.begin(), books.end()) {}
 
     std::span<const Book> GetBooks() const { return std::span<const Book>{books_.data(), books_.size()}; }
     std::span<Book> GetBooks() { return std::span<Book>{books_.data(), books_.size()}; }
-    AuthorContainer &GetAuthors() { return authors_; }
-    const AuthorContainer &GetAuthors() const { return authors_; }
+    [[nodiscard]] const AuthorContainer &GetAuthors() const { return authors_; }
 
     void Clear() {
         books_.clear();
@@ -64,29 +64,14 @@ public:
     size_type size() const noexcept { return books_.size(); }
     size_type max_size() const noexcept { return books_.max_size(); }
 
-    iterator insert(const_iterator pos, const value_type &value) { return books_.insert(pos, value); }
-
-    iterator insert(const_iterator pos, value_type &&value) { return books_.insert(pos, std::move(value)); }
-
-    template <typename... Args>
-    iterator emplace(const_iterator pos, Args &&...args) {
-        return books_.emplace(pos, std::forward<Args>(args)...);
-    }
-
-    iterator erase(const_iterator pos) { return books_.erase(pos); }
-
-    iterator erase(const_iterator first, const_iterator last) { return books_.erase(first, last); }
-
     void PushBack(const Book &book) { EmplaceBack(book); }
     void PushBack(Book &&book) { EmplaceBack(std::move(book)); }
 
     template <typename... Args>
         requires std::constructible_from<Book, Args...>
     void EmplaceBack(Args &&...args) {
-        auto args_tuple = std::forward_as_tuple(std::forward<Args>(args)...);
-        auto &&author_param = std::get<1>(args_tuple);
-        auto [author_it, inserted] = authors_.insert(std::string(author_param));
         auto &inserted_book = books_.emplace_back(std::forward<Args>(args)...);
+        auto [author_it, _] = authors_.insert(std::string(inserted_book.author));
         inserted_book.author = std::string_view(*author_it);
     }
 

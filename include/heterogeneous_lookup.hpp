@@ -8,17 +8,11 @@ namespace bookdb {
 struct TransparentStringLess {
     using is_transparent = void;
     bool operator()(std::string_view a, std::string_view b) const noexcept { return a < b; }
-    bool operator()(const std::string &a, std::string_view b) const noexcept { return std::string_view(a) < b; }
-    bool operator()(std::string_view a, const std::string &b) const noexcept { return a < std::string_view(b); }
-    bool operator()(const std::string &lhs, const std::string &rhs) const noexcept { return lhs < rhs; };
 };
 
 struct TransparentStringEqual {
     using is_transparent = void;
     bool operator()(std::string_view a, std::string_view b) const noexcept { return a == b; }
-    bool operator()(const std::string &a, std::string_view b) const noexcept { return std::string_view(a) == b; }
-    bool operator()(std::string_view a, const std::string &b) const noexcept { return a == std::string_view(b); }
-    bool operator()(const std::string &lhs, const std::string &rhs) const noexcept { return lhs == rhs; };
 };
 
 struct TransparentStringHash {

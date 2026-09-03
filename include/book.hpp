@@ -97,14 +97,11 @@ struct formatter<bookdb::Genre, char> {
 template <>
 struct formatter<bookdb::Book, char> {
 
-    std::formatter<bookdb::Genre> genre_formatter;
-
     template <typename FormatContext>
     auto format(const bookdb::Book b, FormatContext &fc) const {
         // clang-format on
-        format_to(fc.out(), "Author: {}\nTitle {}\nYear {}\nGenre ", b.author, b.title, b.year);
-        genre_formatter.format(b.genre, fc);
-        return format_to(fc.out(), "\nRating {}\nRead count {}\n", b.rating, b.read_count);
+        return format_to(fc.out(), "Author {}\nTitle {}\nYear {}\nRating {}\nGenre {}\nRead count {}\n", b.author,
+                         b.title, b.year, b.rating, b.genre, b.read_count);
     }
 
     constexpr auto parse(format_parse_context &ctx) {
