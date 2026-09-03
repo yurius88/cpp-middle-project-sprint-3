@@ -5,15 +5,40 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "type": "lldb",
+            // "type": "lldb",
+            // "request": "launch",
+            // "name": "Launch BookDB",
+            // "program": "${workspaceFolder}/build/BookDB",
+            // "args": [
+            // ],
+            // "cwd": "${workspaceFolder}/build",
+            // "preLaunchTask": "GCC: Build Debug",
+            // "initCommands": ["settings set target.disable-aslr false"]
+            "type": "cppdbg",
+            "MIDebuggerPath": "/usr/bin/gdb",
             "request": "launch",
             "name": "Launch BookDB",
-            "program": "${workspaceFolder}/build/BookDB",
+            "program": "${workspaceFolder}/build/BookDB",            
+            "autoAttachChildProcesses": true,            
+            "cwd": "${workspaceFolder}/build",    
+            "console": "internalConsole", // <-- Направляет вывод в Debug Console вместо Terminal
+            "externalConsole": false,
+            "MIMode": "gdb",
             "args": [
+               
             ],
-            "cwd": "${workspaceFolder}/build",
-            "preLaunchTask": "GCC: Build Debug",
-            "initCommands": ["settings set target.disable-aslr false"]
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Запретить GDB трогать терминал, используемый Git",
+                    "text": "set inferior-tty /dev/null", // <--- ДОБАВЬТЕ ЭТУ СТРОКУ
+                    "ignoreFailures": true
+                }
+            ]
         },
         {
             "type": "lldb",
