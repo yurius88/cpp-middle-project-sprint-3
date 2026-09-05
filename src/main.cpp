@@ -3,6 +3,7 @@
 #include "book.hpp"
 #include "book_database.hpp"
 #include "comparators.hpp"
+#include "filters.hpp"
 #include "statsistics.hpp"
 
 using namespace bookdb;
@@ -72,5 +73,9 @@ int main() {
         std::print("\nTransparent lookup by authors. Found Orwell's book: \n{}\n", *orwellBookIt);
     }
 
+    // sample books
+    auto samples = sampleRandomBooks(db, 3);
+    std::print("\n\nSample books:\n");
+    std::for_each(samples.cbegin(), samples.cend(), [](const auto &v) { std::print("{}\n", v.get()); });
     return 0;
 }

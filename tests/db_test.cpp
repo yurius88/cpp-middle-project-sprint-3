@@ -69,8 +69,7 @@ TEST(TestComponentName, BookDataBaseCheckHistogram) {
     db.EmplaceBack("1984", "George Orwell", 1949, Genre::SciFi, 4., 190);
     db.EmplaceBack("Animal Farm", "George Orwell", 1945, Genre::Fiction, 4.4, 143);
     auto histogram = buildAuthorHistogramFlat(db);
-
-    ASSERT_TRUE(histogram[std::string("George Orwell")] == 2);
+    ASSERT_TRUE(histogram[*db.GetAuthors().find("George Orwell")] == 2);
 }
 
 TEST(TestComponentName, BookDataBaseChecAvgRating) {
@@ -88,4 +87,25 @@ TEST(TestComponentName, BookDataBaseChecAvgRating) {
     auto avrRating = calculateAverageRating(db);
 
     EXPECT_NEAR(avrRating, 4.49f, 1e-3);
+}
+
+TEST(TestComponentName, BookDataBaseCheckPushBack) {
+    BookDatabase<std::vector<Book>> db;
+    Book book1("The Great Gatsby", "Scott Fitzgerald", 1925, Genre::Fiction, 4.5, 120);
+    db.PushBack(book1);
+    Book book2("The Great Gatsby", "Scott Fitzgerald", 1925, Genre::Fiction, 4.5, 120);
+    db.PushBack(std::move(book2));
+    ASSERT_TRUE(db.size() == 2);
+}
+
+TEST(TestComponentName, BookDataBaseCheckAvgRatingEmptyDb) {
+    BookDatabase<std::vector<Book>> db;
+    auto rating = calculateAverageRating(db);
+    EXPECT_NEAR(rating, 0, 1e-1);
+}
+
+TEST(TestComponentName, BookDataBaseCheckGenreRatingEmptyDb) {
+    BookDatabase<std::vector<Book>> db;
+    auto rating = calculateGenreRatings(db.begin(), db.end());
+    ASSERT_TRUE(rating.empty());
 }

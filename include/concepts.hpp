@@ -25,14 +25,7 @@ template <typename T>
 concept BookIterator = std::forward_iterator<T>;
 
 template <typename S, typename I>
-concept BookSentinel = requires(S sentinel, I iterator) {
-    *iterator;
-    requires std::same_as<std::remove_cvref_t<decltype(*iterator)>, Book>;
-    { iterator == sentinel } -> std::same_as<bool>;
-    { iterator != sentinel } -> std::same_as<bool>;
-    { sentinel == iterator } -> std::same_as<bool>;
-    { sentinel != iterator } -> std::same_as<bool>;
-};
+concept BookSentinel = std::sentinel_for<S, I>;
 
 template <typename P>
 concept BookPredicate = requires(P predicate, const Book &lhs) {
